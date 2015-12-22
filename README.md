@@ -18,16 +18,6 @@ SAML 2.0 Single Sign-On allows you to use any SAML 2.0-compliant Identity Provid
 3. Configure the **Identity Provider** and **Service Provider** sections of the plugin in the **Settings > Single Sign-On** menu.
 4. Enable the plugin to do authentication on the **General** section of the plugin.
 
-== Frequently asked questions ==
-
-= What does this plugin do with my passwords? =
-
-Because of the way SAML SSO systems work, this plugin is never aware of your password. When activated, you will always enter your password into your company's SSO portal website, which will then pass an authentication token--not a real password--to the WordPress site.
-
-= Do I really need an SSL certificate to use this plugin? =
-
-You may have noticed the fields that ask you to upload an SSL certificate and private key. This is only necessary if you want users to initiate their login from your website, that is, by visiting the `/wp-login.php` URL on your site. Logins that originate from the SSO portal will work fine without this certificate. Because exchanging the certificate with your Identity Provider is part of the initial setup process, it is not necessary to have a publicly-signed (paid for) certificate. You can generate a self-signed certificate for free and use that.
-
 ## Changelog
 
 ### 0.9.2
