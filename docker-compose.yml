@@ -1,0 +1,29 @@
+mysql-data:
+  build: ./containers/mysql-data
+  volumes:
+    - /var/lib/mysql
+    - /docker-entrypoint-initdb.d
+  command: "true"
+mysql:
+  image: mysql:5.7
+  volumes_from:
+    - mysql-data
+  environment:
+    - MYSQL_ROOT_PASSWORD
+    - MYSQL_DATABASE
+    - MYSQL_USER
+    - MYSQL_PASSWORD
+  ports:
+    - 3306:3306
+wordpress:
+  build: ./containers/${WORDPRESS_BUILD_DIR}
+  environment:
+    - WORDPRESS_DB_NAME=${MYSQL_DATABASE}
+    - WORDPRESS_DB_USER=${MYSQL_USER}
+    - WORDPRESS_DB_PASS=${MYSQL_PASSWORD}
+  links:
+    - mysql:mysql
+  ports:
+    - 80:80
+  volumes:
+    - ./src:/var/www/html/wp-content/plugins/saml-20-single-sign-on

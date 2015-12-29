@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -eou pipefail
+
+ROOT=$(cd $(dirname $0)/..; pwd)
+source ${ROOT}/env
+
+cd ${ROOT} && docker-compose up -d --force-recreate
