@@ -18,6 +18,17 @@ SAML 2.0 Single Sign-On allows you to use any SAML 2.0-compliant Identity Provid
 3. Configure the **Identity Provider** and **Service Provider** sections of the plugin in the **Settings > Single Sign-On** menu.
 4. Enable the plugin to do authentication on the **General** section of the plugin.
 
+## Development
+
+Plugin development with this repo requires Docker and Docker Compose > `1.5.2`.
+
+1. Copy the sample environment file, `env.sample` to `env`.
+1. Assign values to each of the environment variables.
+1. Run `script/build`
+1. Run `script/start`
+
+The Wordpress instance will be available on port 80 of your Docker host, with the plugin (in `./src`) mounted to the appropriate plugins directory inside the Wordpress container. This assumes your Docker host can see your working filesystem, which in many cases will require a Virtualbox-backed docker-machine instance.
+
 ## Changelog
 
 ### 0.9.2
