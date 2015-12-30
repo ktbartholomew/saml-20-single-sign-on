@@ -30,7 +30,7 @@
   <br/>
   <div class="option-separator"></div>
 
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'] . '?page=' . basename(__FILE__); ?>&updated=true">
+<form method="post">
 <?php wp_nonce_field('sso_general'); ?>
 <table class="form-table">
   <tr>
@@ -42,7 +42,7 @@
     </td>
   </tr>
 	<tr valign="top">
-    <th scope="row"><label for="enabled"><strong>Enable SAML authentication</strong></label></th> 
+    <th scope="row"><label for="enabled"><strong>Enable SAML authentication</strong></label></th>
     <?php
 			$checked = ($saml_opts['enabled']) ? ' checked="checked"' : '';
 		?><td><input type="checkbox" name="enabled" id="enabled" value="enabled" <?php echo $checked;?> />

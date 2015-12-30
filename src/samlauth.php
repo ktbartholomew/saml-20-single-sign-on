@@ -1,19 +1,24 @@
 <?php
 /*
 Plugin Name: SAML 2.0 Single Sign-On
-Version: 0.9.2
+Version: 0.9.3b
 Plugin URI: http://keithbartholomew.com
 Description: Authenticate users using <a href="http://rnd.feide.no/simplesamlphp">simpleSAMLphp</a>.
 Author: Keith Bartholomew
 Author URI: http://keithbartholomew.com
 */
 
+// Store all config stuff with the main blog, which is defined by BLOG_ID_CURRENT_SITE
+switch_to_blog(constant('BLOG_ID_CURRENT_SITE'));
 $upload_dir = wp_upload_dir();
 define('SAMLAUTH_CONF', $upload_dir['basedir'] . '/saml-20-single-sign-on/etc');
 define('SAMLAUTH_CONF_URL', $upload_dir['baseurl'] . '/saml-20-single-sign-on/etc');
+restore_current_blog();
+
 define('SAMLAUTH_ROOT',dirname(__FILE__));
 define('SAMLAUTH_URL',plugins_url() . '/' . basename( dirname(__FILE__) ) );
 define('SAMLAUTH_MD_URL', constant('SAMLAUTH_URL') . '/saml/www/module.php/saml/sp/metadata.php/' . get_current_blog_id() );
+
 
 // Things needed everywhere
 require_once( constant('SAMLAUTH_ROOT') . '/lib/classes/saml_settings.php' );
@@ -35,4 +40,4 @@ if( is_admin() )
   $SAML_Admin = new SAML_Admin();
 }
 
-// end of file 
+// end of file

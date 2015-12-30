@@ -3,6 +3,15 @@
 $wp_opt = get_option('saml_authentication_options');
 $blog_id = (string)get_current_blog_id();
 
+$idp_file = constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini';
+
+if(file_exists($idp_file)) {
+	$idp = array_keys(parse_ini_file($idp_file ,true))[0];
+}
+else {
+	$idp = NULL;
+}
+
 
 $config = array(
 
@@ -17,7 +26,7 @@ $config = array(
 
 	// An authentication source which can authenticate against both SAML 2.0
 	// and Shibboleth 1.3 IdPs.
-	
+
 	$blog_id => array(
 		'saml:SP',
 		'NameIDPolicy' => $wp_opt['nameidpolicy'],
@@ -29,7 +38,7 @@ $config = array(
 		'redirect.sign' => TRUE,
 		// The entity ID of the IdP this should SP should contact.
 		// Can be NULL/unset, in which case the user will be shown a list of available IdPs.
-		'idp' => $wp_opt['idp']
+		'idp' => $idp
 	)
 );
 

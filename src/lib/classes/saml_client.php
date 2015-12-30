@@ -4,31 +4,31 @@ class SAML_Client
   private $saml;
   private $opt;
   private $secretsauce;
-  
+
   function __construct()
   {
     $this->settings = new SAML_Settings();
-    
+
     require_once(constant('SAMLAUTH_ROOT') . '/saml/lib/_autoload.php');
 		if( $this->settings->get_enabled() )
 		{
 			$this->saml = new SimpleSAML_Auth_Simple((string)get_current_blog_id());
-			
+
 			add_action('wp_authenticate',array($this,'authenticate'));
 	    add_action('wp_logout',array($this,'logout'));
       add_action('login_form', array($this, 'modify_login_form'));
 		}
-    
+
     // Hash to generate password for SAML users.
     // This is never actually used by the user, but we need to know what it is, and it needs to be consistent
-    
+
     // WARNING: If the WP AUTH_KEY is changed, all SAML users will be unable to login! In cases where this is
     //   actually desired, such as an intrusion, you must delete SAML users or manually set their passwords.
     //   it's messy, so be careful!
 
     $this->secretsauce = constant('AUTH_KEY');
   }
-  
+
   /**
    *  Authenticates the user using SAML
    *
@@ -65,17 +65,17 @@ class SAML_Client
       else
       {
         die('A username was not provided.');
-      }  
+      }
     }
   }
-  
+
   /**
    * Sends the user to the SAML Logout URL (using SLO if available) and then redirects to the site homepage
    *
    * @return void
    */
   public function logout()
-  { 
+  {
     $this->saml->logout( get_option('siteurl') );
   }
 
@@ -90,10 +90,10 @@ class SAML_Client
       echo '<input type="hidden" name="use_sso" value="false">'."\n";
     }
   }
-  
+
   /**
    * Creates a new user in the WordPress database using attributes from the IdP
-   * 
+   *
    * @param array $attrs The array of attributes created by SimpleSAMLPHP
    * @return void
    */
@@ -111,9 +111,9 @@ class SAML_Client
     {
       die('A username was not provided.');
     }
-    
+
     $role = $this->update_role();
-    
+
     if( $role !== false )
     {
       $user_opts = array(
@@ -133,7 +133,7 @@ class SAML_Client
       die('The website administrator has not given you permission to log in.');
     }
   }
-  
+
   /**
    * Authenticates the user with WordPress using wp_signon()
    *
@@ -143,15 +143,15 @@ class SAML_Client
   private function simulate_signon($username)
   {
     remove_filter('wp_authenticate',array($this,'authenticate'));
-    
+
     $this->update_role();
-    
+
     $login = array(
       'user_login' => $username,
       'user_password' => $this->user_password($username,$this->secretsauce),
       'remember' => false
     );
-    
+
     $use_ssl = ( defined('FORCE_SSL_ADMIN') && constant('FORCE_SSL_ADMIN') === true ) ? true : '';
     $result = wp_signon($login,$use_ssl);
     if(is_wp_error($result))
@@ -172,11 +172,11 @@ class SAML_Client
       exit();
     }
   }
-  
+
   /**
    * Updates a user's role if their current one doesn't match the attributes provided by the IdP
    *
-   * @return string 
+   * @return string
    */
   private function update_role()
   {
@@ -216,35 +216,35 @@ class SAML_Client
     {
       $role = false;
     }
-    
+
     $user = get_user_by('login',$attrs[$this->settings->get_attribute('username')][0]);
     if($user)
     {
       $user->set_role($role);
     }
-    
+
     return $role;
   }
-  
+
   /**
    * Generates a SHA-256 HMAC hash using the username and secret key
-   * 
+   *
    * @param string $value the user's username
    * @param string $key a secret key
-   * @return string 
+   * @return string
    */
   private function user_password($value,$key)
   {
     $hash = hash_hmac('sha256',$value,$key);
     return $hash;
   }
-  
+
   public function show_password_fields($show_password_fields) {
     return false;
   }
-  
+
   public function disable_function() {
     die('Disabled');
   }
-  
+
 } // End of Class SamlAuth
