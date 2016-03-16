@@ -387,6 +387,14 @@ Class SAML_Settings
       $this->settings['option_version'] = $this->current_version;
       $this->settings['allow_sso_bypass'] = false;
     }
+
+    // Make sure ['groups'] == wp_roles()->roles
+    foreach( wp_roles()->roles as $role_name => $role_meta ) {
+        if(!isset($this->settings['groups'][$role_name])){
+            $changed = true;
+            $this->settings['groups'][$role_name] = '';
+        }
+    }
     
     return($changed);
   }

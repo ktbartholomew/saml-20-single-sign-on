@@ -135,36 +135,14 @@
   <h3>Groups</h3>
   <p>You don't have to fill in all of these, but you should have at least one. Users will get their WordPress permissions based on the highest-ranking group they are members of.</p>
   <table class="form-table">
+  <?php foreach(wp_roles()->roles as $role_name => $role_meta): ?>
   <tr>
-    <th><label for="admin_entitlement">Administrators Group Name</label></th>
-    <td><input type="text" name="admin_group" id="admin_group" value="<?php echo $this->settings->get_group('admin'); ?>" size="40" data-if-empty="warning" /><br/>
-    <span class="setting-description">Users in this group will be assigned the role of &ldquo;Administrator&rdquo;</span>
+  <th><label for="<?php echo $role_name ?>_entitlement"><?php echo $role_meta['name'] ?>s Group Name</label></th>
+    <td><input type="text" name="<?php echo $role_name ?>_group" id="<?php echo $role_name ?>_group" value="<?php echo $this->settings->get_group($role_name); ?>" size="40" data-if-empty="warning" /><br/>
+    <span class="setting-description">Users in this group will be assigned the role of &ldquo;<?php echo $role_meta['name'] ?>&rdquo;</span>
     </td>
   </tr>
-  <tr>
-    <th scope="row"><label for="editor_group">Editors Group Name</label></th>
-    <td><input type="text" name="editor_group" id="editor_group" value="<?php echo $this->settings->get_group('editor'); ?>" size="40" /><br/>
-    <span class="setting-description">Users in this group will be assigned the role of &ldquo;Editor&rdquo;</span>
-    </td>
-  </tr>
-  <tr>
-    <th scope="row"><label for="editor_group">Authors Group Name</label></th>
-    <td><input type="text" name="author_group" id="author_group" value="<?php echo $this->settings->get_group('author'); ?>" size="40" /><br/>
-    <span class="setting-description">Users in this group will be assigned the role of &ldquo;Author&rdquo;</span>
-    </td>
-  </tr>
-  <tr>
-    <th><label for="editor_group">Contributors Group Name</label></th>
-    <td><input type="text" name="contributor_group" id="contributor_group" value="<?php echo $this->settings->get_group('contributor'); ?>" size="40" /><br/>
-    <span class="setting-description">Users in this group will be assigned the role of &ldquo;Contributor&rdquo;</span>
-    </td>
-  </tr>
-  <tr>
-    <th><label for="editor_group">Subscribers Group Name</label></th>
-    <td><input type="text" name="subscriber_group" id="subscriber_group" value="<?php echo $this->settings->get_group('subscriber'); ?>" size="40" /><br/>
-    <span class="setting-description">Users in this group will be assigned the role of &ldquo;Subscriber&rdquo;</span>
-    </td>
-  </tr>
+  <?php endforeach; ?>
   <tr>
     <th><label for="allow_unlisted_users">Allow Unlisted Users</label></th>
     <td><input type="checkbox" name="allow_unlisted_users" id="allow_unlisted_users" value="allow" <?php echo ($this->settings->get_allow_unlisted_users()) ? 'checked="checked"' : ''; ?> /><br/>

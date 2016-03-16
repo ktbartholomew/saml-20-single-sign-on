@@ -67,12 +67,10 @@
       $this->settings->set_attribute('lastname',$_POST['lastname_attribute']);
       $this->settings->set_attribute('email',$_POST['email_attribute']);
       $this->settings->set_attribute('groups',$_POST['groups_attribute']);
-      
-      $this->settings->set_group('admin',$_POST['admin_group']);
-      $this->settings->set_group('editor',$_POST['editor_group']);
-      $this->settings->set_group('author',$_POST['author_group']);
-      $this->settings->set_group('contributor',$_POST['contributor_group']);
-      $this->settings->set_group('subscriber',$_POST['subscriber_group']);
+
+      foreach(wp_roles()->roles as $role_name => $role_meta){
+          $this->settings->set_group($role_name, $_POST[sprintf('%s_group', $role_name)]);
+      }
       
       $this->settings->set_idp($_POST['idp']);
       $this->settings->set_nameidpolicy($_POST['nameidpolicy']);
