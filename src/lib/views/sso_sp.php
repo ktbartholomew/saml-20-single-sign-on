@@ -6,9 +6,6 @@
         echo '<div class="error below-h2"><p>No Identity Providers have been configured. You will not be able to configure WordPress for Single Sign-On until this is set up.</p></div>'."\n";
     }
 ?>
-<pre>
-  <?php var_dump($idp); ?>
-</pre>
 <form method="post" enctype="multipart/form-data">
 <?php wp_nonce_field('sso_sp'); ?>
 <input type="hidden" name="MAX_FILE_SIZE" value="4194304" />

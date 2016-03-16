@@ -2,7 +2,7 @@
 Contributors: ktbartholomew
 Tags: sso, saml, single sign-on, simplesamlphp, onelogin, ssocircle
 Requires at least: 3.3
-Tested up to: 3.8
+Tested up to: 4.4
 Stable tag: 0.9.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -32,7 +32,7 @@ You may have noticed the fields that ask you to upload an SSL certificate and pr
 
 == Changelog ==
 
-= 0.9.2 = 
+= 0.9.2 =
 * Updates a few look-and-feel things to fit better with WP 3.8
 * Resolves an issue that was preventing the IdP from being recognized when adding IdP information manually.
 * Respects the redirect_to parameter in wp-login.php, allowing SAML logins to redirect users to any page of your choosing.
