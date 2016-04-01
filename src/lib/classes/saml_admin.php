@@ -212,7 +212,7 @@ Class SAML_Admin
       }
     }
 
-    /**
+    /*
      * Check if public and private keys are set in the database config
      * otherwise check for cert files.
      */
