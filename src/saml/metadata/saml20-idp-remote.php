@@ -1,9 +1,20 @@
 <?php
+/**
+ * Metadata that is parse and used by the simplesaml
+ * SimpleSAML_Metadata parser object. This is
+ * required for simple saml to obtain the proper
+ * sp configurations.
+ */
 
 $ini = null;
 $wp_opt = get_option('saml_authentication_options');
 $blog_id = (string)get_current_blog_id();
 
+/*
+ * Check database for idp detail configuration,
+ * if not found, use flat file configuration.
+ * If idp details are missing, the plugin should halt with parser error.
+ */
 if (isset($wp_opt['idp_details'])) {
     $ini = parse_ini_string($wp_opt['idp_details'], true);
 }

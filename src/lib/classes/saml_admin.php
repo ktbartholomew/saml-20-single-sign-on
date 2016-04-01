@@ -52,11 +52,20 @@ Class SAML_Admin
   	remove_submenu_page( 'options-general.php', 'sso_help.php');
   }
 
+  /**
+   * Get identity provider details
+   * @return array
+   */
   private function _get_idp_details()
   {
       $config_path = constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini';
       $idp_details = null;
       $idp_settings = $this->settings->get_idp_details();
+
+      /*
+       Read configuration details from database, if none is available,
+       check for a configuration file, otherwise use default values.
+       */
       if($idp_settings) {
           $idp_details = parse_ini_string($idp_settings, true);
       }
@@ -203,6 +212,10 @@ Class SAML_Admin
       }
     }
 
+    /**
+     * Check if public and private keys are set in the database config
+     * otherwise check for cert files.
+     */
     if(
         (
             $this->settings->get_public_key()

@@ -211,6 +211,10 @@ Class SAML_Settings
     $this->_set_settings();
   }
 
+  /**
+   * Get idp config details
+   * @return string|false     INI formatted string, false otherwise
+   */
   public function get_idp_details()
   {
       return isset($this->settings['idp_details'])
@@ -218,11 +222,19 @@ Class SAML_Settings
               : false;
   }
 
+  /**
+   * Set idp config details
+   * @param string $details INI formatted string
+   */
   public function set_idp_details($details)
   {
       $this->settings['idp_details'] = (string)$details;
   }
 
+  /**
+   * Get the public signing key
+   * @return string|false Formatted certificate, false otherwise
+   */
   public function get_public_key()
   {
       return isset($this->settings['certificate']['public_key'])
@@ -230,11 +242,19 @@ Class SAML_Settings
               : false;
   }
 
+  /**
+   * Set the public signing key
+   * @param string $key Formatted key
+   */
   public function set_public_key($key)
   {
       $this->settings['certificate']['public_key'] = (string)$key;
   }
 
+  /**
+   * Get the private signing key
+   * @return string|false Formatted key, false otherwise
+   */
   public function get_private_key()
   {
       return isset($this->settings['certificate']['private_key'])
@@ -242,6 +262,10 @@ Class SAML_Settings
               : false;
   }
 
+  /**
+   * Set the private signing key
+   * @param string $key Formatted key
+   */
   public function set_private_key($key)
   {
       $this->settings['certificate']['private_key'] = (string)$key;

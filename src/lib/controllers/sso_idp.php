@@ -7,11 +7,21 @@
  *
  */
 
- function _get_idp_details($settings)
+ /**
+  * Closure to get idp configuration details
+  * @param  SAML_Settings $settings config object
+  * @return array
+  */
+ function _get_idp_details(SAML_Settings $settings)
  {
      $config_path = constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini';
      $idp_details = null;
      $idp_settings = $settings->get_idp_details();
+
+     /*
+      Read configuration details from database, if none is available,
+      check for a configuration file, otherwise use default values.
+      */
      if($idp_settings) {
          $idp_details = parse_ini_string($idp_settings, true);
      }
@@ -102,6 +112,7 @@ if ( isset($_POST['fetch_metadata']) && wp_verify_nonce($_POST['_wpnonce'],'sso_
       $contents .= '  SingleLogoutService = "' . $idp_data['idp_logout'] . '"'."\n";
       $contents .= '  certFingerprint = "' . str_replace(':','',$idp_data['idp_fingerprint']) . '"'."\n";
 
+      // Save configurations to database
       $this->settings->enable_cache();
       $this->settings->set_idp_details($contents);
       $this->settings->set_idp($idp_data['idp_identifier']);
@@ -127,6 +138,7 @@ elseif (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'],'sso_idp_m
     $contents .= '  SingleLogoutService = "' . $_POST['idp_logout'] . '"'."\n";
     $contents .= '  certFingerprint = "' . str_replace(':','',$_POST['idp_fingerprint']) . '"'."\n";
 
+    // Save configurations to database
     $this->settings->enable_cache();
     $this->settings->set_idp_details($contents);
     $this->settings->disable_cache();
@@ -136,6 +148,7 @@ $status = $this->get_saml_status();
 $metadata = array(); // the variable used in the idp file.
 $ini = _get_idp_details($this->settings);
 
+// Read idp configuration details to inject into view
 foreach($ini as $key => $array)
 {
     $metadata[$key] = array(

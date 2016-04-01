@@ -6,6 +6,7 @@
       $upload_dir = constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id();
       if(! is_dir($upload_dir))
       {
+          // Create all parent directories to store certs
           mkdir($upload_dir, 0775, true);
       }
 
@@ -46,9 +47,12 @@
           $key = file_get_contents($_FILES['privatekey']['tmp_name']);
           if(openssl_x509_check_private_key($cert,$key))
           {
+              //keys pass openssl key pair check,
+              //store keys in database
               $this->settings->set_public_key($cert);
               $this->settings->set_private_key($key);
 
+              //write the private key on save for simple saml parsing
               $key_uploaded = ( file_put_contents($upload_dir . '/' . get_current_blog_id() . '.key', $key) ) ? true : false;
           }
           else

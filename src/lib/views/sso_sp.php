@@ -60,6 +60,11 @@
   <tr valign="top" class="manual_cert">
     <th scope="row"><label for="certificate">Signing Certificate</label></th>
     <?php
+            /*
+             * Check database for public/private key info,
+             * if not found, check for flat files,
+             * otherwise use empty values
+             */
             if($this->settings->get_public_key() && $this->settings->get_private_key())
             {
                 $certificate = $this->settings->get_public_key();
