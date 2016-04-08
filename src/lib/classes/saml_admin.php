@@ -2,17 +2,17 @@
 Class SAML_Admin
 {
   private $settings;
-  
+
   function __construct()
   {
     $this->settings = new SAML_Settings();
     add_action('init',array($this,'admin_menus'));
   }
-  
+
   function admin_menus()
   {
   	if( is_multisite() )
-  	{	
+  	{
   		add_action('network_admin_menu', array($this,'saml_idp_menus'));
   		add_action('admin_menu', array($this,'saml_sp_menus'));
   	}
@@ -22,43 +22,43 @@ Class SAML_Admin
   		add_action('admin_menu', array($this,'saml_sp_menus'));
   	}
   }
-  
+
   function saml_idp_menus()
   {
   	if( is_multisite() )
   	{
   		add_submenu_page('settings.php', 'Single Sign-On', 'Single Sign-On', 'manage_network', 'sso_idp.php', array($this,'sso_idp'));
   		add_submenu_page('settings.php', 'Single Sign-On', 'Single Sign-On', 'manage_network', 'sso_help.php', array($this,'sso_help'));
-  		
+
   		remove_submenu_page( 'settings.php', 'sso_help.php' );
   	}
   	else
   	{
   		add_submenu_page('options-general.php', 'Single Sign-On', 'Single Sign-On', 'administrator', 'sso_idp.php', array($this,'sso_idp'));
   		add_submenu_page('options-general.php', 'Single Sign-On', 'Single Sign-On', 'administrator', 'sso_help.php', array($this,'sso_help'));
-  		
+
   		remove_submenu_page( 'options-general.php', 'sso_idp.php' );
   		remove_submenu_page( 'options-general.php', 'sso_help.php' );
   	}
   }
-  
+
   function saml_sp_menus()
   {
   	add_submenu_page('options-general.php', 'Single Sign-On', 'Single Sign-On', 'administrator', 'sso_general.php', array($this,'sso_general'));
   	add_submenu_page('options-general.php', 'Single Sign-On', 'Single Sign-On', 'administrator', 'sso_sp.php', array($this,'sso_sp'));
   	add_submenu_page('options-general.php', 'Single Sign-On', 'Single Sign-On', 'administrator', 'sso_help.php', array($this,'sso_help'));
-  	
+
   	remove_submenu_page( 'options-general.php', 'sso_sp.php');
   	remove_submenu_page( 'options-general.php', 'sso_help.php');
   }
-  
+
   /*
   * Function Get SAML Status
   *   Evaluates SAML configuration for basic sanity
-  *  
+  *
   *
   * @param void
-  * 
+  *
   * @return Object
   */
   public function get_saml_status()
@@ -67,7 +67,7 @@ Class SAML_Admin
       $return->html = "";
       $return->num_warnings = 0;
       $return->num_errors = 0;
-    
+
     $status = array(
       'idp_entityid' => array(
           'error_default' => 'You have not changed your IdP&rsquo;s Entity ID from the default value. You should update it to a real value.',
@@ -79,17 +79,17 @@ Class SAML_Admin
           'error'   => 'You have not changed your IdP&rsquo;s Single Sign-On URL from the default value. You should update it to a real value.',
           'warning' => 'You have not provided a Single Sign-On URL for your IdP. Users will have to log in using the <a href="?page=sso_help.php#idp-first-flow">IdP-first flow</a>.',
           'ok'      => 'You have provided a Single Sign-On URL for your IdP.',
-        ), 
+        ),
         'idp_slo' => array(
           'error'   => 'You have not changed your IdP&rsquo;s Single Logout URL from the default value. You should update it to a real value.',
           'warning' => 'You have not provided a Single Logout URL for your IdP. Users will not be logged out of the IdP when logging out of your site.',
           'ok'      => 'You have provided a Single Logout URL for your IdP.',
-        ),  
+        ),
         'idp_fingerprint' => array(
           'error'   => 'You have not provided a Certificate Fingerprint for your IdP',
           'warning' => '',
           'ok'      => 'You have provided a Certificate Fingerprint for your IdP.',
-        ), 
+        ),
         'sp_certificate' => array(
           'error'   => '',
           'warning' => 'You have not provided a Certificate or Private Key for this site. Users may not be able to log in using the SP-first flow.',
@@ -106,7 +106,7 @@ Class SAML_Admin
           'ok'      => 'You have specified permission groups for this site.',
         )
     );
-    
+
     $status_html = array(
       'error'   => array(
         '<tr class="red"><td><i class="icon-remove icon-large"></i></td><td>',
@@ -121,18 +121,18 @@ Class SAML_Admin
         '</td></tr>'
       )
     );
-    
+
     $idp_ini = parse_ini_file(constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini',true);
-    
+
     $return->html .= '<table class="saml_status">'."\n";
-    
+
     if (is_array($idp_ini))
-    {  
+    {
       foreach($idp_ini as $key => $val)
       {
         if( trim($key) != '' && $key != 'https://your-idp.net')
         {
-          $return->html .= $status_html['ok'][0] . $status['idp_entityid']['ok'] . $status_html['ok'][1]; 
+          $return->html .= $status_html['ok'][0] . $status['idp_entityid']['ok'] . $status_html['ok'][1];
         }
         elseif( trim($key) == 'https://your-idp.net')
         {
@@ -144,7 +144,7 @@ Class SAML_Admin
           $return->html .= $status_html['error'][0] . $status['idp_entityid']['error_blank'] . $status_html['ok'][1];
           $return->num_errors++;
         }
-        
+
         if( $val['SingleSignOnService'] == 'https://your-idp.net/SSOService' )
         {
           $return->html .= $status_html['error'][0] . $status['idp_sso']['error'] . $status_html['error'][1];
@@ -157,7 +157,7 @@ Class SAML_Admin
         {
           $return->html .= $status_html['warning'][0] . $status['idp_sso']['warning'] . $status_html['warning'][1];
         }
-        
+
         if( $val['SingleLogoutService'] == 'https://your-idp.net/SingleLogoutService' )
         {
           $return->html .= $status_html['error'][0] . $status['idp_slo']['error'] . $status_html['error'][1];
@@ -171,7 +171,7 @@ Class SAML_Admin
         {
           $return->html .= $status_html['warning'][0] . $status['idp_slo']['warning'] . $status_html['warning'][1];
         }
-        
+
         if( $val['certFingerprint'] != '0000000000000000000000000000000000000000' && $val['certFingerprint'] != '')
         {
           $return->html .= $status_html['ok'][0] . $status['idp_fingerprint']['ok'] . $status_html['ok'][1];
@@ -183,7 +183,7 @@ Class SAML_Admin
         }
       }
     }
-    
+
     if(file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.cer') && file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.key'))
     {
       $return->html .= $status_html['ok'][0] . $status['sp_certificate']['ok'] . $status_html['ok'][1];
@@ -192,7 +192,7 @@ Class SAML_Admin
     {
       $return->html .= $status_html['warning'][0] . $status['sp_certificate']['warning'] . $status_html['warning'][1];
     }
-    
+
     if( trim($this->settings->get_attribute('username')) == '' || trim($this->settings->get_attribute('groups')) == '' )
     {
       $return->html .= $status_html['error'][0] . $status['sp_attributes']['error'] . $status_html['error'][1];
@@ -206,42 +206,42 @@ Class SAML_Admin
     {
       $return->html .= $status_html['ok'][0] . $status['sp_attributes']['ok'] . $status_html['ok'][1];
     }
-    
-    if( trim($this->settings->get_group('admin')) != '' )
+
+    if( trim($this->settings->get_group('administrator')) != '' )
     {
       $return->html .= $status_html['ok'][0] . $status['sp_permissions']['ok'] . $status_html['ok'][1];
     }
-    elseif(trim($this->settings->get_group('admin')) == '' && (trim($this->settings->get_group('editor')) != '' || trim($this->settings->get_group('author')) != '' || trim($this->settings->get_group('contributor')) != '' || trim($this->settings->get_group('subscriber')) != '') )
+    elseif(trim($this->settings->get_group('administrator')) == '' && (trim($this->settings->get_group('editor')) != '' || trim($this->settings->get_group('author')) != '' || trim($this->settings->get_group('contributor')) != '' || trim($this->settings->get_group('subscriber')) != '') )
     {
       $return->html .= $status_html['warning'][0] . $status['sp_permissions']['warning'] . $status_html['warning'][1];
     }
-    elseif( trim($this->settings->get_group('admin')) == '' && trim($this->settings->get_group('editor')) == '' && trim($this->settings->get_group('author')) == '' && trim($this->settings->get_group('contributor')) == '' && trim($this->settings->get_group('subscriber')) == '' )
+    elseif( trim($this->settings->get_group('administrator')) == '' && trim($this->settings->get_group('editor')) == '' && trim($this->settings->get_group('author')) == '' && trim($this->settings->get_group('contributor')) == '' && trim($this->settings->get_group('subscriber')) == '' )
     {
       $return->html .= $status_html['error'][0] . $status['sp_permissions']['error'] . $status_html['error'][1];
       $return->num_errors++;
     }
-    
+
     $return->html .= '</table>'."\n";
-    
+
     return $return;
   }
-  
+
   public function sso_general(){
     include(constant('SAMLAUTH_ROOT') . '/lib/controllers/' . __FUNCTION__ . '.php');
   }
-  
+
   public function sso_idp(){
     include(constant('SAMLAUTH_ROOT') . '/lib/controllers/' . __FUNCTION__ . '.php');
   }
-  
+
   public function sso_sp(){
     include(constant('SAMLAUTH_ROOT') . '/lib/controllers/' . __FUNCTION__ . '.php');
   }
-  
+
   public function sso_help(){
     include(constant('SAMLAUTH_ROOT') . '/lib/controllers/' . __FUNCTION__ . '.php');
   }
-  
+
 }
 
 // End of file saml_admin.php
