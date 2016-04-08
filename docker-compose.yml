@@ -13,8 +13,8 @@ mysql:
     - MYSQL_DATABASE
     - MYSQL_USER
     - MYSQL_PASSWORD
-  ports:
-    - 3306:3306
+  expose:
+    - 3306
 wordpress:
   build: ./containers/${WORDPRESS_BUILD_DIR}
   environment:
@@ -22,8 +22,8 @@ wordpress:
     - WORDPRESS_DB_USER=${MYSQL_USER}
     - WORDPRESS_DB_PASS=${MYSQL_PASSWORD}
   links:
-    - mysql:mysql
-  ports:
-    - 80:80
+    - mysql
+  expose:
+    - 80
   volumes:
     - ./src:/var/www/html/wp-content/plugins/saml-20-single-sign-on

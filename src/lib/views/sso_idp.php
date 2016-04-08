@@ -1,23 +1,6 @@
 <div class="wrap">
     <h2>SAML Identity Provider Settings</h2>
     <p><strong>Note:</strong> A valid Identity Provider (IdP) must be defined before <?php if( is_multisite()){ echo 'any sites in the network';} else{ echo 'the site';}?> can use Single-Sign On.<?php if( is_multisite()){ echo ' These settings affect all sites in your network.';}?></p>
-  <?php
-      // Check some config setttings.
-
-        $etc_dir =  constant('SAMLAUTH_CONF');
-        $etc_writable = is_writable($etc_dir);
-        $idp_ini_present =  file_exists(constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini');
-
-        if( !$etc_writable )
-        {
-            echo '<div class="error below-h2"><p>I\'m not able to write to the folder <code>' . $etc_dir . '</code> which means you won\'t be able to change any settings! Please ensure that the web server has permission to make changes to this folder.</p></div>'."\n";
-        }
-
-        if( isset($save_status) && $save_status === FALSE )
-        {
-            echo '<div class="error below-h2"><p>Your changes couldn&rsquo;t be saved. Is the file writable by the server?</p></div>'."\n";
-        }
-    ?>
   <form method="post">
     <?php wp_nonce_field('sso_idp_metadata'); ?>
     <h3>Autofill using Metadata</h3>

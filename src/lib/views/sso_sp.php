@@ -1,6 +1,6 @@
 <div class="wrap">
 <?php
-    $idp = parse_ini_file( constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini',true);
+    $idp = $this->settings->get_idp_details();
     if($idp === FALSE)
     {
         echo '<div class="error below-h2"><p>No Identity Providers have been configured. You will not be able to configure WordPress for Single Sign-On until this is set up.</p></div>'."\n";
@@ -60,7 +60,20 @@
   <tr valign="top" class="manual_cert">
     <th scope="row"><label for="certificate">Signing Certificate</label></th>
     <?php
-            if(file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.cer') && file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.key'))
+            /*
+             * Check database for public/private key info,
+             * if not found, check for flat files,
+             * otherwise use empty values
+             */
+            if($this->settings->get_public_key() && $this->settings->get_private_key())
+            {
+                $certificate = $this->settings->get_public_key();
+	            $certificate_cn = openssl_x509_parse($certificate);
+	            $certificate_cn = $certificate_cn['subject']['CN'];
+	            $privatekey = $this->settings->get_private_key();
+	            $privatekey_match = openssl_x509_check_private_key($certificate,$privatekey);
+            }
+            elseif(file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.cer') && file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.key'))
             {
 	            $certificate = file_get_contents( constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.cer' );
 	            $certificate_cn = openssl_x509_parse($certificate);

@@ -55,6 +55,17 @@ class SAML_Client
         $username = $attrs[$this->settings->get_attribute('username')][0];
         if(get_user_by('login',$username))
         {
+            /*
+             * Override passwords to match saml return values
+             * set by the idp
+             */
+            require_once(ABSPATH . WPINC . '/ms-functions.php');
+            $user = get_user_by( 'login', $username );
+            if($user)
+            {
+              $newpass = $this->user_password($username,$this->secretsauce);
+              wp_set_password( $newpass , $user->ID );
+            };
           $this->simulate_signon($username);
         }
         else
