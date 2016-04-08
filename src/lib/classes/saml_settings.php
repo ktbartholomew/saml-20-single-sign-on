@@ -10,7 +10,7 @@ Class SAML_Settings
   function __construct()
   {
     $this->wp_option = 'saml_authentication_options';
-    $this->current_version = '0.9.2';
+    $this->current_version = '0.9.3';
     $this->cache = false;
     $this->_check_environment();
     $this->_get_settings();
@@ -440,6 +440,14 @@ Class SAML_Settings
 
       $this->settings['option_version'] = $this->current_version;
       $this->settings['allow_sso_bypass'] = false;
+    }
+
+    // Make sure ['groups'] == wp_roles()->roles
+    foreach( wp_roles()->roles as $role_name => $role_meta ) {
+        if(!isset($this->settings['groups'][$role_name])){
+            $changed = true;
+            $this->settings['groups'][$role_name] = '';
+        }
     }
 
     return($changed);

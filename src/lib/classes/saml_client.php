@@ -194,26 +194,13 @@ class SAML_Client
     $attrs = $this->saml->getAttributes();
     if(array_key_exists($this->settings->get_attribute('groups'), $attrs) )
     {
-      if( in_array($this->settings->get_group('admin'),$attrs[$this->settings->get_attribute('groups')]) )
-      {
-        $role = 'administrator';
+      foreach(wp_roles()->roles as $role_name => $role_meta){
+          if( in_array($this->settings->get_group($role_name),$attrs[$this->settings->get_attribute('groups')]) )
+          {
+            $role = $role_name;
+          }
       }
-      elseif( in_array($this->settings->get_group('editor'),$attrs[$this->settings->get_attribute('groups')]) )
-      {
-        $role = 'editor';
-      }
-      elseif( in_array($this->settings->get_group('author'),$attrs[$this->settings->get_attribute('groups')]) )
-      {
-        $role = 'author';
-      }
-      elseif( in_array($this->settings->get_group('contributor'),$attrs[$this->settings->get_attribute('groups')]) )
-      {
-        $role = 'contributor';
-      }
-      elseif( in_array($this->settings->get_group('subscriber'),$attrs[$this->settings->get_attribute('groups')]) )
-      {
-        $role = 'subscriber';
-      }
+      if(isset($role)){}
       elseif( $this->settings->get_allow_unlisted_users() )
       {
         $role = 'subscriber';
@@ -257,5 +244,4 @@ class SAML_Client
   public function disable_function() {
     die('Disabled');
   }
-
 } // End of Class SamlAuth
