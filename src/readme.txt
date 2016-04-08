@@ -3,7 +3,7 @@ Contributors: ktbartholomew
 Tags: sso, saml, single sign-on, simplesamlphp, onelogin, ssocircle
 Requires at least: 3.3
 Tested up to: 4.4
-Stable tag: 0.9.3
+Stable tag: 0.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,10 @@ Because of the way SAML SSO systems work, this plugin is never aware of your pas
 You may have noticed the fields that ask you to upload an SSL certificate and private key. This is only necessary if you want users to initiate their login from your website, that is, by visiting the `/wp-login.php` URL on your site. Logins that originate from the SSO portal will work fine without this certificate. Because exchanging the certificate with your Identity Provider is part of the initial setup process, it is not necessary to have a publicly-signed (paid for) certificate. You can generate a self-signed certificate for free and use that.
 
 == Changelog ==
+
+= 0.9.4 =
+
+* Generate truly random passwords for new SAML users behind the scenes. Remove the requirement to be able to recreate that password in order to log in a user.
 
 = 0.9.3 =
 

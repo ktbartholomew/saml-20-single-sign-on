@@ -3,7 +3,7 @@ Contributors: ktbartholomew
 Tags: sso, saml, single sign-on, simplesamlphp, onelogin, ssocircle
 Requires at least: 3.3
 Tested up to: 4.4
-Stable tag: 0.9.3
+Stable tag: 0.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 ---
@@ -30,6 +30,10 @@ Plugin development with this repo requires Docker and Docker Compose > `1.5.2`.
 The Wordpress instance will be available on port 80 of your Docker host, with the plugin (in `./src`) mounted to the appropriate plugins directory inside the Wordpress container. This assumes your Docker host can see your working filesystem, which in many cases will require a Virtualbox-backed docker-machine instance.
 
 ## Changelog
+
+### 0.9.4
+
+* Generate truly random passwords for new SAML users behind the scenes. Remove the requirement to be able to recreate that password in order to log in a user.
 
 ### 0.9.3
 
