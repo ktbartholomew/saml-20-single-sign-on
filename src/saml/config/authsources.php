@@ -5,7 +5,17 @@ $blog_id = (string)get_current_blog_id();
 
 $idp_file = constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini';
 
-if(file_exists($idp_file)) {
+/*
+ * Check database for idp detail configuration,
+ * if not found, check for flat file configuration
+ * otherwise, use empty config
+ */
+if (isset($wp_opt['idp_details']))
+{
+    $idp = array_keys(parse_ini_string($wp_opt['idp_details'], true))[0];
+}
+elseif (file_exists($idp_file))
+{
 	$idp = array_keys(parse_ini_file($idp_file ,true))[0];
 }
 else {
@@ -42,14 +52,48 @@ $config = array(
 	)
 );
 
-// Cert and Key may not exist
-
-if( file_exists( constant('SAMLAUTH_CONF') . '/certs/' . $blog_id . '/' . $blog_id . '.cer') )
+// Cert and Key may not exist,
+// check database then for flat files
+if(isset($wp_opt['certificate']['public_key']))
+{
+    $config[$blog_id]['certData'] = $wp_opt['certificate']['public_key'];
+}
+elseif (file_exists( constant('SAMLAUTH_CONF') . '/certs/' . $blog_id . '/' . $blog_id . '.cer') )
 {
 	$config[$blog_id]['certificate'] = constant('SAMLAUTH_CONF') . '/certs/' . $blog_id . '/' . $blog_id . '.cer';
 }
 
-if( file_exists( constant('SAMLAUTH_CONF') . '/certs/' . $blog_id . '/' . $blog_id . '.key') )
+// Set key paths
+$upload_dir = constant('SAMLAUTH_CONF') . '/certs/' . $blog_id;
+$keyPath = $upload_dir . '/' . $blog_id . '.key';
+
+// If key information is found in database,
+// but keyfile doesn't exist, create it
+// otherwise, check if keyfile exists
+if(
+    isset($wp_opt['certificate']['private_key'])
+    && !file_exists($keyPath)
+)
 {
-	$config[$blog_id]['privatekey'] = constant('SAMLAUTH_CONF') . '/certs/' . $blog_id . '/' . $blog_id . '.key';
+    // Create all parent directories to store private key
+    if(! is_dir($upload_dir))
+    {
+        mkdir($upload_dir, 0775, true);
+    }
+
+    if (
+        file_put_contents(
+            $keyPath,
+            $wp_opt['certificate']['private_key']
+        )
+    )
+    {
+        $config[$blog_id]['privatekey'] = $keyPath;
+    }
 }
+elseif( file_exists($keyPath))
+{
+	$config[$blog_id]['privatekey'] = $keyPath;
+}
+
+return $config;

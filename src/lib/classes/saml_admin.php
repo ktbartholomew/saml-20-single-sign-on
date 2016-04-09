@@ -52,6 +52,35 @@ Class SAML_Admin
   	remove_submenu_page( 'options-general.php', 'sso_help.php');
   }
 
+  /**
+   * Get identity provider details
+   * @return array
+   */
+  private function _get_idp_details()
+  {
+      $config_path = constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini';
+      $idp_details = null;
+      $idp_settings = $this->settings->get_idp_details();
+
+      /*
+       Read configuration details from database, if none is available,
+       check for a configuration file, otherwise use default values.
+       */
+      if($idp_settings) {
+          $idp_details = parse_ini_string($idp_settings, true);
+      }
+      elseif(file_exists($config_path))
+      {
+          $idp_details = parse_ini_file($config_path, true);
+      }
+      else
+      {
+          $idp_details = parse_ini_string("[https://your-idp.net]\nname = Your IdP\nSingleSignOnService = https://your-idp.net/SSOService\nSingleLogoutService = https://your-idp.net/SingleLogoutService\ncertFingerprint = 0000000000000000000000000000000000000000", true);
+      }
+
+      return $idp_details;
+  }
+
   /*
   * Function Get SAML Status
   *   Evaluates SAML configuration for basic sanity
@@ -122,8 +151,8 @@ Class SAML_Admin
       )
     );
 
-    $idp_ini = parse_ini_file(constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini',true);
 
+    $idp_ini = $this->_get_idp_details();
     $return->html .= '<table class="saml_status">'."\n";
 
     if (is_array($idp_ini))
@@ -184,7 +213,21 @@ Class SAML_Admin
       }
     }
 
-    if(file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.cer') && file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.key'))
+    /*
+     * Check if public and private keys are set in the database config
+     * otherwise check for cert files.
+     */
+    if(
+        (
+            $this->settings->get_public_key()
+            && $this->settings->get_private_key()
+        )
+        ||
+        (
+            file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.cer')
+            && file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.key')
+        )
+    )
     {
       $return->html .= $status_html['ok'][0] . $status['sp_certificate']['ok'] . $status_html['ok'][1];
     }

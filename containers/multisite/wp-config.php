@@ -84,7 +84,8 @@ $table_prefix  = 'wp_';
  *
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
-define('WP_DEBUG', false);
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
 
 // If we're behind a proxy server and using HTTPS, we need to alert Wordpress of that fact
 // see also http://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy
@@ -93,14 +94,13 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 }
 
 /* Multisite */
-
-// define('WP_ALLOW_MULTISITE', true);
-define('MULTISITE', true);
+define('WP_ALLOW_MULTISITE', true);
+/*define('MULTISITE', true);
 define('SUBDOMAIN_INSTALL', false);
 define('DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
 define('PATH_CURRENT_SITE', '/');
 define('SITE_ID_CURRENT_SITE', 1);
-define('BLOG_ID_CURRENT_SITE', 1);
+define('BLOG_ID_CURRENT_SITE', 1);*/
 
 /* That's all, stop editing! Happy blogging. */
 

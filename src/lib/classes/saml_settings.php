@@ -212,6 +212,66 @@ Class SAML_Settings
   }
 
   /**
+   * Get idp config details
+   * @return string|false     INI formatted string, false otherwise
+   */
+  public function get_idp_details()
+  {
+      return isset($this->settings['idp_details'])
+              ? (string) $this->settings['idp_details']
+              : false;
+  }
+
+  /**
+   * Set idp config details
+   * @param string $details INI formatted string
+   */
+  public function set_idp_details($details)
+  {
+      $this->settings['idp_details'] = (string)$details;
+  }
+
+  /**
+   * Get the public signing key
+   * @return string|false Formatted certificate, false otherwise
+   */
+  public function get_public_key()
+  {
+      return isset($this->settings['certificate']['public_key'])
+              ? (string) $this->settings['certificate']['public_key']
+              : false;
+  }
+
+  /**
+   * Set the public signing key
+   * @param string $key Formatted key
+   */
+  public function set_public_key($key)
+  {
+      $this->settings['certificate']['public_key'] = (string)$key;
+  }
+
+  /**
+   * Get the private signing key
+   * @return string|false Formatted key, false otherwise
+   */
+  public function get_private_key()
+  {
+      return isset($this->settings['certificate']['private_key'])
+              ? (string) $this->settings['certificate']['private_key']
+              : false;
+  }
+
+  /**
+   * Set the private signing key
+   * @param string $key Formatted key
+   */
+  public function set_private_key($key)
+  {
+      $this->settings['certificate']['private_key'] = (string)$key;
+  }
+
+  /**
    * Retrieves settings from the database; performs upgrades or sets defaults as necessary
    *
    * @return void
@@ -264,6 +324,11 @@ Class SAML_Settings
       'option_version' => $this->current_version,
       'enabled' => false,
       'idp' => 'https://your-idp.net',
+      'idp_details' =>  "[https://your-idp.net]\nname = Your IdP\nSingleSignOnService = https://your-idp.net/SSOService\nSingleLogoutService = https://your-idp.net/SingleLogoutService\ncertFingerprint = 0000000000000000000000000000000000000000",
+      'certificate' =>  array(
+          'public_key'  =>  '',
+          'private_key' =>  ''
+      ),
       'nameidpolicy' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
       'attributes' => array(
         'username' => '',
@@ -294,31 +359,20 @@ Class SAML_Settings
    */
   private function _check_environment()
   {
+      if(! file_exists( constant('SAMLAUTH_CONF') ) )
+       {
+               mkdir( constant('SAMLAUTH_CONF'), 0775, true );
+       }
 
-  	if(! file_exists( constant('SAMLAUTH_CONF') ) )
-  	{
-  		mkdir( constant('SAMLAUTH_CONF'), 0775, true );
-  	}
+       if(! file_exists( constant('SAMLAUTH_CONF') . '/certs') )
+       {
+               mkdir( constant('SAMLAUTH_CONF') . '/certs', 0775, true );
+       }
 
-  	if(! file_exists( constant('SAMLAUTH_CONF') . '/certs') )
-  	{
-  		mkdir( constant('SAMLAUTH_CONF') . '/certs', 0775, true );
-  	}
-
-  	if(! file_exists( constant('SAMLAUTH_CONF') . '/config' ) )
-  	{
-  		mkdir( constant('SAMLAUTH_CONF') . '/config' , 0775, true );
-  	}
-
-  	if(! file_exists(constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini') )
-  	{
-  		file_put_contents(constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini',"[https://your-idp.net]\nname = Your IdP\nSingleSignOnService = https://your-idp.net/SSOService\nSingleLogoutService = https://your-idp.net/SingleLogoutService\ncertFingerprint = 0000000000000000000000000000000000000000");
-  	}
-
-  	if(! file_exists( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) || md5_file( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) != '9f6dc1ce87ca80bc859b47780447f1a6')
-  	{
-  		file_put_contents( constant('SAMLAUTH_CONF') . '/certs/.htaccess' , "<Files ~ \"\\.(key)$\">\nDeny from all\n</Files>" );
-  	}
+       if(! file_exists( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) || md5_file( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) != '9f6dc1ce87ca80bc859b47780447f1a6')
+       {
+               file_put_contents( constant('SAMLAUTH_CONF') . '/certs/.htaccess' , "<Files ~ \"\\.(key)$\">\nDeny from all\n</Files>" );
+       }
   }
 
   /**
