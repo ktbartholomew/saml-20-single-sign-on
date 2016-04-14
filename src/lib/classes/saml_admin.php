@@ -151,6 +151,7 @@ Class SAML_Admin
       )
     );
 
+
     $idp_ini = $this->_get_idp_details();
     $return->html .= '<table class="saml_status">'."\n";
 
@@ -249,15 +250,15 @@ Class SAML_Admin
       $return->html .= $status_html['ok'][0] . $status['sp_attributes']['ok'] . $status_html['ok'][1];
     }
 
-    if( trim($this->settings->get_group('admin')) != '' )
+    if( trim($this->settings->get_group('administrator')) != '' )
     {
       $return->html .= $status_html['ok'][0] . $status['sp_permissions']['ok'] . $status_html['ok'][1];
     }
-    elseif(trim($this->settings->get_group('admin')) == '' && (trim($this->settings->get_group('editor')) != '' || trim($this->settings->get_group('author')) != '' || trim($this->settings->get_group('contributor')) != '' || trim($this->settings->get_group('subscriber')) != '') )
+    elseif(trim($this->settings->get_group('administrator')) == '' && (trim($this->settings->get_group('editor')) != '' || trim($this->settings->get_group('author')) != '' || trim($this->settings->get_group('contributor')) != '' || trim($this->settings->get_group('subscriber')) != '') )
     {
       $return->html .= $status_html['warning'][0] . $status['sp_permissions']['warning'] . $status_html['warning'][1];
     }
-    elseif( trim($this->settings->get_group('admin')) == '' && trim($this->settings->get_group('editor')) == '' && trim($this->settings->get_group('author')) == '' && trim($this->settings->get_group('contributor')) == '' && trim($this->settings->get_group('subscriber')) == '' )
+    elseif( trim($this->settings->get_group('administrator')) == '' && trim($this->settings->get_group('editor')) == '' && trim($this->settings->get_group('author')) == '' && trim($this->settings->get_group('contributor')) == '' && trim($this->settings->get_group('subscriber')) == '' )
     {
       $return->html .= $status_html['error'][0] . $status['sp_permissions']['error'] . $status_html['error'][1];
       $return->num_errors++;
