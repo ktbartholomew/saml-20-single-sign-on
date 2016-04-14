@@ -184,7 +184,7 @@ class SAML_Client
     if(array_key_exists($this->settings->get_attribute('groups'), $attrs) )
     {
       foreach(wp_roles()->roles as $role_name => $role_meta){
-          if( in_array($this->settings->get_group($role_name),$attrs[$this->settings->get_attribute('groups')]) )
+          if( !isset($role) && in_array($this->settings->get_group($role_name),$attrs[$this->settings->get_attribute('groups')]) )
           {
             $role = $role_name;
           }
