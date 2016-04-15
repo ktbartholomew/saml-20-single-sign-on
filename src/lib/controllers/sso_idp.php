@@ -23,7 +23,7 @@
       check for a configuration file, otherwise use default values.
       */
      if($idp_settings) {
-         $idp_details = parse_ini_string($idp_settings, true);
+         $idp_details = $idp_settings;
      }
      elseif(file_exists($config_path))
      {
@@ -31,7 +31,15 @@
      }
      else
      {
-         $idp_details = parse_ini_string("[https://your-idp.net]\nname = Your IdP\nSingleSignOnService = https://your-idp.net/SSOService\nSingleLogoutService = https://your-idp.net/SingleLogoutService\ncertFingerprint = 0000000000000000000000000000000000000000", true);
+         $idp_details = $idp_details = array(
+          'https://your-idp.net' =>
+          array(
+            'name' => 'Your IdP',
+            'SingleSignOnService' => 'https://your-idp.net/SSOService',
+            'SingleLogoutService' => 'https://your-idp.net/SingleLogoutService',
+            'certFingerprint' => '0000000000000000000000000000000000000000',
+          ),
+        );
      }
 
      return $idp_details;
@@ -106,11 +114,15 @@ if ( isset($_POST['fetch_metadata']) && wp_verify_nonce($_POST['_wpnonce'],'sso_
         $idp_data['idp_fingerprint'] = '0000000000000000000000000000000000000000';
       }
 
-      $contents =  '[' . $idp_data['idp_identifier'] . ']'."\n";
-      $contents .= '  name = "' . $idp_data['idp_name'] . '"'."\n";
-      $contents .= '  SingleSignOnService = "' . $idp_data['idp_signon'] . '"'."\n";
-      $contents .= '  SingleLogoutService = "' . $idp_data['idp_logout'] . '"'."\n";
-      $contents .= '  certFingerprint = "' . str_replace(':','',$idp_data['idp_fingerprint']) . '"'."\n";
+      $contents =  [
+          $idp_data['idp_identifier'] =>
+          [
+              'name' => $idp_data['idp_name'],
+              'SingleSignOnService' => $idp_data['idp_signon'],
+              'SingleLogoutService' => $idp_data['idp_logout'],
+              'certFingerprint' => str_replace(':', '', $idp_data['idp_fingerprint'])
+          ]
+      ];
 
       // Save configurations to database
       $this->settings->enable_cache();
@@ -122,6 +134,7 @@ if ( isset($_POST['fetch_metadata']) && wp_verify_nonce($_POST['_wpnonce'],'sso_
 }
 elseif (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'],'sso_idp_manual') )
 {
+    $contents = [];
     $old_ini = _get_idp_details($this->settings);
 
     foreach($old_ini as $key => $val)
@@ -132,11 +145,14 @@ elseif (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'],'sso_idp_m
         }
     }
 
-    $contents =  '[' . $_POST['idp_identifier'] . ']'."\n";
-    $contents .= '  name = "' . $_POST['idp_name'] . '"'."\n";
-    $contents .= '  SingleSignOnService = "' . $_POST['idp_signon'] . '"'."\n";
-    $contents .= '  SingleLogoutService = "' . $_POST['idp_logout'] . '"'."\n";
-    $contents .= '  certFingerprint = "' . str_replace(':','',$_POST['idp_fingerprint']) . '"'."\n";
+    $contents = [
+        $_POST['idp_identifier'] => [
+            'name' => $_POST['idp_name'],
+            'SingleSignOnService' => $_POST['idp_signon'],
+            'SingleLogoutService' => $_POST['idp_logout'],
+            'certFingerprint' => str_replace(':', '', $_POST['idp_fingerprint'])
+        ]
+    ];
 
     // Save configurations to database
     $this->settings->enable_cache();

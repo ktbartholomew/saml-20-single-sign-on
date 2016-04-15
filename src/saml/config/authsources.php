@@ -12,7 +12,7 @@ $idp_file = constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini';
  */
 if (isset($wp_opt['idp_details']))
 {
-    $idp = array_keys(parse_ini_string($wp_opt['idp_details'], true))[0];
+    $idp = array_keys($wp_opt['idp_details'])[0];
 }
 elseif (file_exists($idp_file))
 {

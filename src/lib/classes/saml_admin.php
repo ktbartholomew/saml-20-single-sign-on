@@ -67,7 +67,7 @@ Class SAML_Admin
        check for a configuration file, otherwise use default values.
        */
       if($idp_settings) {
-          $idp_details = parse_ini_string($idp_settings, true);
+          $idp_details = $idp_settings;
       }
       elseif(file_exists($config_path))
       {
@@ -75,7 +75,15 @@ Class SAML_Admin
       }
       else
       {
-          $idp_details = parse_ini_string("[https://your-idp.net]\nname = Your IdP\nSingleSignOnService = https://your-idp.net/SSOService\nSingleLogoutService = https://your-idp.net/SingleLogoutService\ncertFingerprint = 0000000000000000000000000000000000000000", true);
+          $idp_details = array(
+              'https://your-idp.net' =>
+              array(
+                'name' => 'Your IdP',
+                'SingleSignOnService' => 'https://your-idp.net/SSOService',
+                'SingleLogoutService' => 'https://your-idp.net/SingleLogoutService',
+                'certFingerprint' => '0000000000000000000000000000000000000000',
+              ),
+          );
       }
 
       return $idp_details;
@@ -217,17 +225,11 @@ Class SAML_Admin
      * Check if public and private keys are set in the database config
      * otherwise check for cert files.
      */
-    if(
-        (
-            $this->settings->get_public_key()
-            && $this->settings->get_private_key()
-        )
-        ||
-        (
-            file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.cer')
-            && file_exists(constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id() . '.key')
-        )
-    )
+    $certPath = constant('SAMLAUTH_CONF') . '/certs/' . get_current_blog_id() . '/' . get_current_blog_id();
+    $hasKeysInDb = ($this->settings->get_public_key() && $this->settings->get_private_key());
+    $keyFilesExist = (file_exists($certPath. '.cer') && file_exists($certPath. '.key'));
+
+    if($hasKeysInDb || $keyFilesExist)
     {
       $return->html .= $status_html['ok'][0] . $status['sp_certificate']['ok'] . $status_html['ok'][1];
     }

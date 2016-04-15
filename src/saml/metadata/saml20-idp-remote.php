@@ -16,7 +16,7 @@ $blog_id = (string)get_current_blog_id();
  * If idp details are missing, the plugin should halt with parser error.
  */
 if (isset($wp_opt['idp_details'])) {
-    $ini = parse_ini_string($wp_opt['idp_details'], true);
+    $ini = $wp_opt['idp_details'];
 }
 else
 {
