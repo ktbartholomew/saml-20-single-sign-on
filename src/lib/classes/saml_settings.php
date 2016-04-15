@@ -213,22 +213,23 @@ Class SAML_Settings
 
   /**
    * Get idp config details
-   * @return string|false     INI formatted string, false otherwise
+   * @return array|false     array [idp_url][idp_details], false otherwise
    */
   public function get_idp_details()
   {
       return isset($this->settings['idp_details'])
-              ? (string) $this->settings['idp_details']
+              ? $this->settings['idp_details']
               : false;
   }
 
   /**
    * Set idp config details
-   * @param string $details INI formatted string
+   * @param array $details array [idp_url][idp_details]
+   * @return void
    */
-  public function set_idp_details($details)
+  public function set_idp_details(array $details)
   {
-      $this->settings['idp_details'] = (string)$details;
+      $this->settings['idp_details'] = $details;
   }
 
   /**
@@ -291,8 +292,31 @@ Class SAML_Settings
     else
     {
       $this->settings = $this->_use_defaults();
+      // In multisite, copy the idp details from main blog
+      if (is_multisite()) {
+          $this->_copy_main_idp_details();
+      }
+
       $this->_set_settings();
     }
+  }
+
+  /**
+   * Copy the idp details from main blog as
+   * defined by BLOG_ID_CURRENT_SITE
+   * @return void
+   */
+  private function _copy_main_idp_details()
+  {
+      switch_to_blog(constant('BLOG_ID_CURRENT_SITE'));
+
+      $main_settings = get_option($this->wp_option);
+
+      if (isset($main_settings['idp_details'])) {
+          $this->set_idp_details($main_settings['idp_details']);
+      }
+
+      restore_current_blog();
   }
 
   /**
@@ -324,7 +348,15 @@ Class SAML_Settings
       'option_version' => $this->current_version,
       'enabled' => false,
       'idp' => 'https://your-idp.net',
-      'idp_details' =>  "[https://your-idp.net]\nname = Your IdP\nSingleSignOnService = https://your-idp.net/SSOService\nSingleLogoutService = https://your-idp.net/SingleLogoutService\ncertFingerprint = 0000000000000000000000000000000000000000",
+      'idp_details' =>  array(
+          'https://your-idp.net' =>
+          array(
+            'name' => 'Your IdP',
+            'SingleSignOnService' => 'https://your-idp.net/SSOService',
+            'SingleLogoutService' => 'https://your-idp.net/SingleLogoutService',
+            'certFingerprint' => '0000000000000000000000000000000000000000',
+          ),
+      ),
       'certificate' =>  array(
           'public_key'  =>  '',
           'private_key' =>  ''
