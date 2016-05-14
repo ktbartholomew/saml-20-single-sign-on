@@ -11,7 +11,7 @@ $tab = $_GET['page'];
       <a href="?page=sso_general.php" class="nav-tab<?php if($tab == 'sso_general.php'){echo ' nav-tab-active';}?>">General <span class="badge badge-important" id="sso_errors"><?php if($status->num_errors != 0) echo $status->num_errors; ?></span></a>
     <?php endif; ?>
 
-    <?php if(is_network_admin()): ?>
+    <?php if(!is_multisite() || is_network_admin()): ?>
       <a href="?page=sso_idp.php" class="nav-tab<?php if($tab == 'sso_idp.php'){echo ' nav-tab-active';}?>">Identity Provider</a>
     <?php endif; ?>
 

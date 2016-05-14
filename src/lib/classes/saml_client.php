@@ -3,7 +3,6 @@ class SAML_Client
 {
   private $saml;
   private $opt;
-  private $secretsauce;
 
   function __construct()
   {
@@ -18,15 +17,6 @@ class SAML_Client
 	    add_action('wp_logout',array($this,'logout'));
       add_action('login_form', array($this, 'modify_login_form'));
 		}
-
-    // Hash to generate password for SAML users.
-    // This is never actually used by the user, but we need to know what it is, and it needs to be consistent
-
-    // WARNING: If the WP AUTH_KEY is changed, all SAML users will be unable to login! In cases where this is
-    //   actually desired, such as an intrusion, you must delete SAML users or manually set their passwords.
-    //   it's messy, so be careful!
-
-    $this->secretsauce = constant('AUTH_KEY');
   }
 
   /**
@@ -47,6 +37,7 @@ class SAML_Client
     }
     else
     {
+
       $redirect_url = (array_key_exists('redirect_to', $_GET)) ? wp_login_url( $_GET['redirect_to']) : get_admin_url();
       $this->saml->requireAuth( array('ReturnTo' => $redirect_url ) );
       $attrs = $this->saml->getAttributes();
@@ -118,7 +109,7 @@ class SAML_Client
     {
       $user_opts = array(
         'user_login' => $login ,
-        'user_pass'  => $this->user_password($login,$this->secretsauce) ,
+        'user_pass'  => $this->random_password(),
         'user_email' => $email ,
         'first_name' => $first_name ,
         'last_name'  => $last_name ,
@@ -142,35 +133,19 @@ class SAML_Client
    */
   private function simulate_signon($username)
   {
-    remove_filter('wp_authenticate',array($this,'authenticate'));
-
     $this->update_role();
+    $user = get_user_by('login', $username);
+    wp_set_auth_cookie($user->ID);
 
-    $login = array(
-      'user_login' => $username,
-      'user_password' => $this->user_password($username,$this->secretsauce),
-      'remember' => false
-    );
-
-    $use_ssl = ( defined('FORCE_SSL_ADMIN') && constant('FORCE_SSL_ADMIN') === true ) ? true : '';
-    $result = wp_signon($login,$use_ssl);
-    if(is_wp_error($result))
+    if( array_key_exists('redirect_to', $_GET) )
     {
-      echo $result->get_error_message();
-      exit();
+      wp_redirect( $_GET['redirect_to'] );
     }
     else
     {
-      if( array_key_exists('redirect_to', $_GET) )
-      {
-        wp_redirect( $_GET['redirect_to'] );
-      }
-      else
-      {
-        wp_redirect(get_admin_url());
-      }
-      exit();
+      wp_redirect(get_admin_url());
     }
+    exit();
   }
 
   /**
@@ -214,16 +189,10 @@ class SAML_Client
   }
 
   /**
-   * Generates a SHA-256 HMAC hash using the username and secret key
-   *
-   * @param string $value the user's username
-   * @param string $key a secret key
-   * @return string
+   * Return a big random string. Depends on OpenSSL.
    */
-  private function user_password($value,$key)
-  {
-    $hash = hash_hmac('sha256',$value,$key);
-    return $hash;
+  private function random_password() {
+    return openssl_random_pseudo_bytes(64);
   }
 
   public function show_password_fields($show_password_fields) {
