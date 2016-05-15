@@ -1,4 +1,5 @@
 env
+docker-compose.override.yml
 
 #####=== Vim ===#####
 [._]*.s[a-w][a-z]

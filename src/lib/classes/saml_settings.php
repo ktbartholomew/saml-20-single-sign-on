@@ -212,6 +212,67 @@ Class SAML_Settings
   }
 
   /**
+   * Get idp config details
+   * @return array|false     array [idp_url][idp_details], false otherwise
+   */
+  public function get_idp_details()
+  {
+      return isset($this->settings['idp_details'])
+              ? $this->settings['idp_details']
+              : false;
+  }
+
+  /**
+   * Set idp config details
+   * @param array $details array [idp_url][idp_details]
+   * @return void
+   */
+  public function set_idp_details(array $details)
+  {
+      $this->settings['idp_details'] = $details;
+  }
+
+  /**
+   * Get the public signing key
+   * @return string|false Formatted certificate, false otherwise
+   */
+  public function get_public_key()
+  {
+      return isset($this->settings['certificate']['public_key'])
+              ? (string) $this->settings['certificate']['public_key']
+              : false;
+  }
+
+  /**
+   * Set the public signing key
+   * @param string $key Formatted key
+   */
+  public function set_public_key($key)
+  {
+      $this->settings['certificate']['public_key'] = (string)$key;
+  }
+
+  /**
+   * Get the private signing key
+   * @return string|false Formatted key, false otherwise
+   */
+  public function get_private_key()
+  {
+      return isset($this->settings['certificate']['private_key'])
+              ? (string) $this->settings['certificate']['private_key']
+              : false;
+  }
+
+  /**
+   * Set the private signing key
+   * @param string $key Formatted key
+   */
+  public function set_private_key($key)
+  {
+      $this->settings['certificate']['private_key'] = (string)$key;
+  }
+
+  /**
    * Retrieves settings from the database; performs upgrades or sets defaults as necessary
    *
    * @return void
@@ -231,8 +292,31 @@ Class SAML_Settings
     else
     {
       $this->settings = $this->_use_defaults();
+      // In multisite, copy the idp details from main blog
+      if (is_multisite()) {
+          $this->_copy_main_idp_details();
+      }
+
       $this->_set_settings();
     }
+  }
+
+  /**
+   * Copy the idp details from main blog as
+   * defined by BLOG_ID_CURRENT_SITE
+   * @return void
+   */
+  private function _copy_main_idp_details()
+  {
+      switch_to_blog(constant('BLOG_ID_CURRENT_SITE'));
+
+      $main_settings = get_option($this->wp_option);
+
+      if (isset($main_settings['idp_details'])) {
+          $this->set_idp_details($main_settings['idp_details']);
+      }
+
+      restore_current_blog();
   }
 
   /**
@@ -264,6 +348,19 @@ Class SAML_Settings
       'option_version' => $this->current_version,
       'enabled' => false,
       'idp' => 'https://your-idp.net',
+      'idp_details' =>  array(
+          'https://your-idp.net' =>
+          array(
+            'name' => 'Your IdP',
+            'SingleSignOnService' => 'https://your-idp.net/SSOService',
+            'SingleLogoutService' => 'https://your-idp.net/SingleLogoutService',
+            'certFingerprint' => '0000000000000000000000000000000000000000',
+          ),
+      ),
+      'certificate' =>  array(
+          'public_key'  =>  '',
+          'private_key' =>  ''
+      ),
       'nameidpolicy' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
       'attributes' => array(
         'username' => '',
@@ -294,31 +391,20 @@ Class SAML_Settings
    */
   private function _check_environment()
   {
+      if(! file_exists( constant('SAMLAUTH_CONF') ) )
+       {
+               mkdir( constant('SAMLAUTH_CONF'), 0775, true );
+       }
 
-  	if(! file_exists( constant('SAMLAUTH_CONF') ) )
-  	{
-  		mkdir( constant('SAMLAUTH_CONF'), 0775, true );
-  	}
+       if(! file_exists( constant('SAMLAUTH_CONF') . '/certs') )
+       {
+               mkdir( constant('SAMLAUTH_CONF') . '/certs', 0775, true );
+       }
 
-  	if(! file_exists( constant('SAMLAUTH_CONF') . '/certs') )
-  	{
-  		mkdir( constant('SAMLAUTH_CONF') . '/certs', 0775, true );
-  	}
-
-  	if(! file_exists( constant('SAMLAUTH_CONF') . '/config' ) )
-  	{
-  		mkdir( constant('SAMLAUTH_CONF') . '/config' , 0775, true );
-  	}
-
-  	if(! file_exists(constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini') )
-  	{
-  		file_put_contents(constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini',"[https://your-idp.net]\nname = Your IdP\nSingleSignOnService = https://your-idp.net/SSOService\nSingleLogoutService = https://your-idp.net/SingleLogoutService\ncertFingerprint = 0000000000000000000000000000000000000000");
-  	}
-
-  	if(! file_exists( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) || md5_file( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) != '9f6dc1ce87ca80bc859b47780447f1a6')
-  	{
-  		file_put_contents( constant('SAMLAUTH_CONF') . '/certs/.htaccess' , "<Files ~ \"\\.(key)$\">\nDeny from all\n</Files>" );
-  	}
+       if(! file_exists( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) || md5_file( constant('SAMLAUTH_CONF') . '/certs/.htaccess' ) != '9f6dc1ce87ca80bc859b47780447f1a6')
+       {
+               file_put_contents( constant('SAMLAUTH_CONF') . '/certs/.htaccess' , "<Files ~ \"\\.(key)$\">\nDeny from all\n</Files>" );
+       }
   }
 
   /**

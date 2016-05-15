@@ -23,7 +23,7 @@ wordpress:
     - WORDPRESS_DB_PASS=${MYSQL_PASSWORD}
   links:
     - mysql:mysql
-  ports:
-    - 80:80
+  expose:
+    - 80
   volumes:
     - ./src:/var/www/html/wp-content/plugins/saml-20-single-sign-on
