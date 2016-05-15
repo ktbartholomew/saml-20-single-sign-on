@@ -388,6 +388,18 @@ Class SAML_Settings
       $this->settings['allow_sso_bypass'] = false;
     }
 
+    // Fixes: Upgrading from 0.9.2 to 0.9.3 deletes admin group mapping
+    // @see https://github.com/ktbartholomew/saml-20-single-sign-on.git
+    $is_new_admin_type = isset($this->settings['groups']['administrator'])
+        &&  $this->settings['groups']['administrator'] != '';
+    $is_old_admin_type = isset($this->settings['groups']['admin'])
+        && $this->settings['groups']['admin'] != '';
+
+    if ( !$is_new_admin_type && $is_old_admin_type )
+    {
+        $this->settings['groups']['administrator'] = $this->settings['groups']['admin'];
+    }
+
     // Make sure ['groups'] == wp_roles()->roles
     foreach( wp_roles()->roles as $role_name => $role_meta ) {
         if(!isset($this->settings['groups'][$role_name])){
