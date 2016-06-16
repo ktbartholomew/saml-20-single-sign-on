@@ -29,6 +29,8 @@ Plugin development with this repo requires Docker and Docker Compose > `1.5.2`.
 
 The Wordpress instance will be available on port 80 of your Docker host, with the plugin (in `./src`) mounted to the appropriate plugins directory inside the Wordpress container. This assumes your Docker host can see your working filesystem, which in many cases will require a Virtualbox-backed docker-machine instance.
 
+**Note for developing with the multisite container:** You will need to add an entry to `/etc/hosts` that maps the hostname `docker` to the IP address of your docker host. See https://github.com/ktbartholomew/saml-20-single-sign-on/issues/9 to understand why this is necessary.
+
 ## Changelog
 
 ### 0.9.4

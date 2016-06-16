@@ -143,7 +143,8 @@
   </tr>
   </table>
   <h3>Groups</h3>
-  <p>You don't have to fill in all of these, but you should have at least one. Users will get their WordPress permissions based on the highest-ranking group they are members of.</p>
+  <p>You don't have to fill in all of these, but you should have at least one. Users will get their WordPress Role based the first matching group in the list below, this usually goes from Administrator to Subscriber. </p>
+  <p>There's currently an <a href="https://github.com/ktbartholomew/saml-20-single-sign-on/issues/8">issue on GitHub</a> that will implement better control on what order of this list will have.</p>
   <table class="form-table">
   <?php foreach(wp_roles()->roles as $role_name => $role_meta): ?>
   <tr>

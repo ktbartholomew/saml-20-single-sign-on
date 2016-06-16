@@ -12,11 +12,13 @@ $idp_file = constant('SAMLAUTH_CONF') . '/config/saml20-idp-remote.ini';
  */
 if (isset($wp_opt['idp_details']))
 {
-    $idp = array_keys($wp_opt['idp_details'])[0];
+    $details = array_keys($wp_opt['idp_details']);
+    $idp = $details[0];
 }
 elseif (file_exists($idp_file))
 {
-	$idp = array_keys(parse_ini_file($idp_file ,true))[0];
+	$details = array_keys(parse_ini_file($idp_file ,true));
+    $idp = $details[0];
 }
 else {
 	$idp = NULL;
@@ -56,7 +58,11 @@ $config = array(
 // check database then for flat files
 if(isset($wp_opt['certificate']['public_key']))
 {
-    $config[$blog_id]['certData'] = $wp_opt['certificate']['public_key'];
+    $certificate = $wp_opt['certificate']['public_key'];
+    $removedCertTag = str_replace('CERTIFICATE-----', '', $certificate);
+    $removedBeginTag = str_replace('-----BEGIN', '', $removedCertTag);
+    $noTags = str_replace('-----END', '', $removedCertTag);
+    $config[$blog_id]['certData'] = trim($noTags);
 }
 elseif (file_exists( constant('SAMLAUTH_CONF') . '/certs/' . $blog_id . '/' . $blog_id . '.cer') )
 {
