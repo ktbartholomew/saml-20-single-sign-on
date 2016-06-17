@@ -31,7 +31,7 @@
      }
      else
      {
-         $idp_details = $idp_details = array(
+         $idp_details = array(
           'https://your-idp.net' =>
           array(
             'name' => 'Your IdP',
