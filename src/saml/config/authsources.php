@@ -17,11 +17,11 @@ if (isset($wp_opt['idp_details']))
 }
 elseif (file_exists($idp_file))
 {
-	$details = array_keys(parse_ini_file($idp_file ,true));
+    $details = array_keys(parse_ini_file($idp_file ,true));
     $idp = $details[0];
 }
 else {
-	$idp = NULL;
+    $idp = NULL;
 }
 
 
@@ -61,7 +61,7 @@ if(isset($wp_opt['certificate']['public_key']))
     $certificate = $wp_opt['certificate']['public_key'];
     $removedCertTag = str_replace('CERTIFICATE-----', '', $certificate);
     $removedBeginTag = str_replace('-----BEGIN', '', $removedCertTag);
-    $noTags = str_replace('-----END', '', $removedCertTag);
+    $noTags = str_replace('-----END', '', $removedBeginTag);
     $config[$blog_id]['certData'] = trim($noTags);
 }
 elseif (file_exists( constant('SAMLAUTH_CONF') . '/certs/' . $blog_id . '/' . $blog_id . '.cer') )
