@@ -1,0 +1,20 @@
+{
+    "name": "ktbartholomew/saml-20-single-sign-on",
+    "description": "a SAML 2.0 SSO plugin for WordPress",
+    "type": "project",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Keith Bartholomew",
+            "email": "keith.bartholomew@gmail.com"
+        }
+    ],
+    "require": {
+        "onelogin/php-saml": "^2.10"
+    },
+    "autoload": {
+      "psr-4": {
+        "Ktbartholomew\\SamlPlugin\\": "./"
+      }
+    }
+}

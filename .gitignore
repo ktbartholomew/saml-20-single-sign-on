@@ -8,3 +8,4 @@ docker-compose.override.yml
 Session.vim
 .netrwhist
 *~
+src/vendor

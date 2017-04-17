@@ -1,17 +1,17 @@
 === SAML 2.0 Single Sign-On ===
 Contributors: ktbartholomew
-Tags: sso, saml, single sign-on, simplesamlphp, onelogin, ssocircle
-Requires at least: 3.3
-Tested up to: 4.4
-Stable tag: 0.9.4
+Tags: sso, saml, single sign-on, onelogin, ssocircle, okta
+Requires at least: 4.3
+Tested up to: 4.7.3
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-SAML 2.0 Single Sign-On allows you to use a SAML 2.0-compliant Identity Provider for Single Sign-On to your blog.
+SAML 2.0 Single Sign-On allows you to use a SAML 2.0 identity provider for single sign-On to your WordPress website.
 
 == Description ==
 
-SAML 2.0 Single Sign-On allows you to use any SAML 2.0-compliant Identity Provider for Single Sign-On to your blog or network of blogs.  The plugin will replace the standard WordPress login screen and can automatically redirect login/logout requests to your SSO portal. Group membership from the Identity Provider (such as Active Directory) can be used to determine what privileges the user will have on your blog, such as Administrator, Editor, or Subscriber. This plugin uses a modified version of the SimpleSAMLPHP library for all SAML assertions, and can be configured exclusively from the WordPress Admin menu.
+SAML 2.0 Single Sign-On allows you to use any SAML 2.0-compliant Identity Provider for Single Sign-On to your blog or network of blogs.  The plugin will replace the standard WordPress login screen and can automatically redirect login/logout requests to your SSO portal. Group membership from the Identity Provider (such as Active Directory) can be used to determine what privileges the user will have on your blog, such as Administrator, Editor, or Subscriber. This plugin uses a modified version of the and can be configured exclusively from the WordPress Admin menu.
 
 == Installation ==
 
